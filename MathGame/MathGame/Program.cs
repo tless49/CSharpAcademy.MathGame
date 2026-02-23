@@ -167,8 +167,8 @@ namespace MathGame
                 Random rand = new();
                 while (_numOfQuestions > 0)
                 {
-                    int one = rand.Next(0, 100);
-                    int two = rand.Next(0,100);
+                    int one = rand.Next(0, 101);
+                    int two = rand.Next(0,101);
                     int answer = 0;
                     string operation = string.Empty;
                     switch (_gameType)
