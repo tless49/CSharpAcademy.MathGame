@@ -1,10 +1,10 @@
 ﻿using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MathGame
 {
     internal class Program
     {
-        Random _randGenerator = new();
         List<Game> _history = new();
         int _numOfQuestions = 5;
         GameType _currentGameType = GameType.Addition;
@@ -31,8 +31,7 @@ namespace MathGame
             switch (selection)
             {
                 case "1":
-                    //PlayGame();
-                    MainMenuGameStart();
+                    PlayGame();
                     break;
                 case "2":
                     OptionsMenu();
@@ -41,8 +40,17 @@ namespace MathGame
                     ShowGameHistory();
                     break;
                 case "4":
+                    Environment.Exit(0);
                     return;
             }
+        }
+        private void PlayGame()
+        {
+            Console.Clear();
+            Game currentGame = new(_currentGameType, _numOfQuestions);
+            currentGame.RunGame();
+            _history.Add(currentGame);
+            MainMenuGameStart();
         }
         private void OptionsMenu()
         {
@@ -69,7 +77,7 @@ namespace MathGame
                     Console.WriteLine("Enter the number of questions per round.");
                     string inputNum = string.Empty;
                     int num;
-                    while( !int.TryParse(selection, out num))
+                    while( !int.TryParse(inputNum, out num))
                     {
                         inputNum = Console.ReadLine();
                     }
@@ -90,8 +98,17 @@ namespace MathGame
             }
             else
             {
-                foreach (Game run in _history)
-                    run.ToString();
+                bool firstGame = true;
+                for (int i = 0; i < _history.Count; i++)
+                {
+                    if (!firstGame)
+                    {
+                        Console.WriteLine("\n\n");
+                        firstGame = false;
+                    }
+                    Console.Write($"Game {i + 1}:");
+                    Console.WriteLine(_history[i].ToString());
+                }
             }
             Console.WriteLine("Press enter to continue");
             Console.ReadLine();
@@ -138,17 +155,80 @@ namespace MathGame
             return score.ToString();
         }
 
-        record Game()
+        record Game(GameType gameType, int numOfQuestions)
         {
-            public int Score;
-            public string GameType;
-            public List<Question> Questions;
+            public int Score { get; private set; }
+            GameType _gameType = gameType;
+            int _numOfQuestions = numOfQuestions;
+            public List<Question> Questions = new(numOfQuestions);
 
+            private void BuildGame()
+            {
+                Random rand = new();
+                while (_numOfQuestions > 0)
+                {
+                    int one = rand.Next(0, 100);
+                    int two = rand.Next(0,100);
+                    int answer = 0;
+                    string operation = string.Empty;
+                    switch (_gameType)
+                    {
+                        case GameType.Addition:
+                            operation = "+";
+                            answer = one + two;
+                            break;
+                        case GameType.Subtraction:
+                            operation = "-"; 
+                            answer = one - two;
+                            break;
+                        case GameType.Multiplication:
+                            operation = "*";
+                            answer = two - one;
+                            break;
+                        case GameType.Division:
+                            List<int> factors = new();
+                            if (one%two != 0)
+                            {
+                                for (two = 1; two < one; two++)
+                                {
+                                    if(one%two == 0) factors.Add(two);
+                                }
+                            }
+                            var index = rand.Next(0, factors.Count);
+                            two = factors[index];
+                            operation = "/";
+                            answer = one / two;
+                            break;
+                    }
+                    Questions.Add(new Question($"{one} {operation} {two}", answer));
+                    _numOfQuestions--;
+                }
+            }
+            public void RunGame()
+            {
+                BuildGame();
+                foreach (Question question in Questions)
+                {
+                    Console.Clear();
+                    Console.WriteLine(question.QuestionText);
+                    string answer = Console.ReadLine();
+                    bool answerValid = int.TryParse(answer, out int intAnswer);
+                    if (!answerValid)
+                    {
+                        question.Answer = "Invalid Input";
+                        question.AnswerCorrect = false;
+                    }
+                    question.Answer = answer;
+                    question.AnswerCorrect = intAnswer == question.correctAnswer;
+                    if (question.AnswerCorrect) Score++;
+                }
+            }
             public override string ToString()
             {
                 StringBuilder sb = new();
 
-                sb.AppendLine($"{GameType} game with {Questions.Count} questions.");
+                sb.AppendLine($"{_gameType} game with {Questions.Count} questions.");
+                sb.AppendLine($"User scored {Score} out of {Questions.Count}.");
                 for ( int i = 0; i < Questions.Count; i++)
                 {
                     sb.AppendLine($"\nQuesiton {i + 1}");
@@ -158,13 +238,20 @@ namespace MathGame
             }
         }
 
-        record Question(string questionText)
+        record Question(string questionText, int correctAnswer)
         {
-            public string QuestionText = questionText;
-            public string Answer = "\"question not answered\"";
-            public bool AnswerCorrect = false;
+            public string QuestionText { get; init; } = questionText;
+            public string Answer { get; set; } = "\"question not answered\"";
+            public int CorrectAnswer { get; init; } = correctAnswer;
+            public bool AnswerCorrect { get; set; } = false;
 
-            public override string ToString() => QuestionText + $"\nUser's Answer: {Answer} was {(AnswerCorrect ? "correct" : "incorrect")}.";
+            public override string ToString() 
+            {
+                string ans = QuestionText + $"\nUser's Answer: {Answer} was {(AnswerCorrect ? "correct" : "incorrect")}.";
+                if (!AnswerCorrect) ans += $"\nCorrect answer: {CorrectAnswer.ToString()}";
+                return ans;
+            }
+
         }
 
         enum GameType
