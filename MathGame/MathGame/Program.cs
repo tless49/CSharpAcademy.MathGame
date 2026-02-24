@@ -162,6 +162,7 @@ namespace MathGame
             int _numOfQuestions = numOfQuestions;
             public List<Question> Questions = new(numOfQuestions);
 
+            // Debated making this private vs public. Rationale for private: no params or return value, so there's no outside user input allowed, so why expose it
             private void BuildGame()
             {
                 Random rand = new();
@@ -183,7 +184,7 @@ namespace MathGame
                             break;
                         case GameType.Multiplication:
                             operation = "*";
-                            answer = two - one;
+                            answer = one * two;
                             break;
                         case GameType.Division:
                             List<int> factors = new();
