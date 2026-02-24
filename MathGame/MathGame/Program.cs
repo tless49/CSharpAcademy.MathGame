@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using static System.Console;
 
 namespace MathGame
 {
@@ -16,14 +17,14 @@ namespace MathGame
 
         private void MainMenuGameStart()
         {
-            Console.Clear();
-            Console.WriteLine("This is The Math Game.");
-            Console.WriteLine($"Your current score is: {CalculateScore()}.");
-            Console.WriteLine("\nSelect an option:");
-            Console.WriteLine($"1: Play Game (Current selection: {_currentGameType}, {_numOfQuestions} quesitons)");
-            Console.WriteLine($"2: Options");
-            Console.WriteLine($"3: Game History");
-            Console.WriteLine($"4: Quit");
+            Clear();
+            WriteLine("This is The Math Game.");
+            WriteLine($"Your current score is: {CalculateScore()}.");
+            WriteLine("\nSelect an option:");
+            WriteLine($"1: Play Game (Current selection: {_currentGameType}, {_numOfQuestions} quesitons)");
+            WriteLine($"2: Options");
+            WriteLine($"3: Game History");
+            WriteLine($"4: Quit");
 
             string selection = GetMenuOption("1", "2", "3", "4");
 
@@ -45,7 +46,7 @@ namespace MathGame
         }
         private void PlayGame()
         {
-            Console.Clear();
+            Clear();
             Game currentGame = new(_currentGameType, _numOfQuestions);
             currentGame.RunGame();
             _history.Add(currentGame);
@@ -53,32 +54,32 @@ namespace MathGame
         }
         private void OptionsMenu()
         {
-            Console.Clear();
-            Console.WriteLine("Options:");
-            Console.WriteLine($"1: Select game type (Current: {_currentGameType})");
-            Console.WriteLine($"2: Set number of questions (Current:{_numOfQuestions})");
-            Console.WriteLine("3: Back");
+            Clear();
+            WriteLine("Options:");
+            WriteLine($"1: Select game type (Current: {_currentGameType})");
+            WriteLine($"2: Set number of questions (Current:{_numOfQuestions})");
+            WriteLine("3: Back");
 
             var selection = GetMenuOption("1", "2", "3");
 
-            Console.Clear();
+            Clear();
             switch (selection)
             {
                 case "1":
-                    Console.WriteLine("Choose Game Type");
-                    Console.WriteLine("1: Addition");
-                    Console.WriteLine("2: Subtraction");
-                    Console.WriteLine("3: Multiplication");
-                    Console.WriteLine("4: Division");
+                    WriteLine("Choose Game Type");
+                    WriteLine("1: Addition");
+                    WriteLine("2: Subtraction");
+                    WriteLine("3: Multiplication");
+                    WriteLine("4: Division");
                     _currentGameType = (GameType)int.Parse(GetMenuOption("1", "2", "3", "4"));
                     break;
                 case "2":
-                    Console.WriteLine("Enter the number of questions per round.");
+                    WriteLine("Enter the number of questions per round.");
                     string inputNum = string.Empty;
                     int num;
                     while( !int.TryParse(inputNum, out num))
                     {
-                        inputNum = Console.ReadLine();
+                        inputNum = ReadLine();
                     }
                     _numOfQuestions = num;
                     break;
@@ -90,10 +91,10 @@ namespace MathGame
         }
         private void ShowGameHistory()
         {
-            Console.Clear();
+            Clear();
             if (_history.Count == 0)
             {
-                Console.WriteLine("Play a game to see your game history");
+                WriteLine("Play a game to see your game history");
             }
             else
             {
@@ -102,15 +103,15 @@ namespace MathGame
                 {
                     if (!firstGame)
                     {
-                        Console.WriteLine("\n\n");
+                        WriteLine("\n\n");
                         firstGame = false;
                     }
-                    Console.Write($"Game {i + 1}:");
-                    Console.WriteLine(_history[i].ToString());
+                    Write($"Game {i + 1}:");
+                    WriteLine(_history[i].ToString());
                 }
             }
-            Console.WriteLine("Press enter to continue");
-            Console.ReadLine();
+            WriteLine("Press enter to continue");
+            ReadLine();
             MainMenuGameStart();
 
         }
@@ -118,16 +119,16 @@ namespace MathGame
         private string GetMenuOption(params string[] validInputs)
         {
             bool firstRun = true;
-            string input = Console.ReadLine();
+            string input = ReadLine();
             while (!validInputs.Contains<string>(input))
             {
                 ClearLinesAbove(1);
                 if (firstRun)
                 {
-                    Console.WriteLine("Enter valid option:");
+                    WriteLine("Enter valid option:");
                     firstRun = false;
                 }
-                input = Console.ReadLine();
+                input = ReadLine();
             }
             return input;
         }
@@ -135,16 +136,16 @@ namespace MathGame
         {
             for (int i = 0; i < linesToClear; i++)
             {
-                Console.SetCursorPosition(0, Console.CursorTop - 1);
+                SetCursorPosition(0, CursorTop - 1);
                 ClearCurrentConsoleLine();
             }
         }
         public static void ClearCurrentConsoleLine()
         {
-            int currentLineCursor = Console.CursorTop;
-            Console.SetCursorPosition(0, Console.CursorTop);
-            Console.Write(new string(' ', Console.WindowWidth));
-            Console.SetCursorPosition(0, currentLineCursor);
+            int currentLineCursor = CursorTop;
+            SetCursorPosition(0, CursorTop);
+            Write(new string(' ', WindowWidth));
+            SetCursorPosition(0, currentLineCursor);
         }
         private string CalculateScore()
         {
@@ -209,9 +210,9 @@ namespace MathGame
                 BuildGame();
                 foreach (Question question in Questions)
                 {
-                    Console.Clear();
-                    Console.WriteLine(question.QuestionText);
-                    string answer = Console.ReadLine();
+                    Clear();
+                    WriteLine(question.QuestionText);
+                    string answer = ReadLine();
                     bool answerValid = int.TryParse(answer, out int intAnswer);
                     if (!answerValid)
                     {
