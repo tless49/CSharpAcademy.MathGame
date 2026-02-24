@@ -244,7 +244,7 @@ namespace MathGame
             public string QuestionText { get; init; } = questionText;
             public string Answer { get; set; } = "\"question not answered\"";
             public int CorrectAnswer { get; init; } = correctAnswer;
-            public bool AnswerCorrect { get; set; } = false;
+            public bool AnswerCorrect { get; set; }
 
             public override string ToString() 
             {
